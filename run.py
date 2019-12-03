@@ -7,8 +7,9 @@ messages = []
 #Adding an empty list
 
 def add_messages(username, message):
-     """Add messages to the `messages` list"""
-    messages.append("{}: {}".format(username, message))
+    """Add messages to the `messages` list"""
+    now = datetime.now().strftime("%H:%M:%S")
+    messages.append("({}) {}: {}".format(now, username, message))
 
 def get_all_messages():
     """Get all of the messages and separate them with a `br`"""
