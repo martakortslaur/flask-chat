@@ -1,38 +1,51 @@
 #To have access to the environment variables
 import os
 from datetime import datetime
-from flask import Flask, redirect, render_template
+from flask import Flask, redirect, render_template, request, session,
+    url_for
 #To initalize our new Flaks application
 app = Flask(__name__)
+app.secret_key = "randomstring123"
 messages = []
 #Adding an empty list
 
-def add_messages(username, message):
+
+
+def add_message(username, message):
     """Add messages to the `messages` list"""
     now = datetime.now().strftime("%H:%M:%S")
-    messages.append("({}) {}: {}".format(now, username, message))
+    #creating a dictionary to store our messages information
+    messages.append({"timestamp": now, "from": username, "message": message})
 
-def get_all_messages():
-    """Get all of the messages and separate them with a `br`"""
-    return "<br>".join(messages)
 
-@app.route("/")
+
+
+@app.route("/", methods=["GET", "POST"])
 def index():
     """Main page with instructions"""
+    if request.method == "POST":
+        session["username"] = request.form["username"]
+
+    """meaning, so if the username variable is set, then instead of returning our index.html template, we're going to redirect to the contents of the session username variable"""
+    if "username" in session: 
+        return redirect(url_for("user", username=session["username"]))
+
     return render_template("index.html")
 
-@app.route("/<username>")
+
+
+@app.route("/chat/<username>", methods=["GET", "POST"])
 def user(username):
-    """Display chat messages"""
-    return "<h1>Welcome, {0}</h1>{1}".format(username, get_all_messages())
+    """Add and Display chat messages"""
+    if request.method == "POST":
+        username = session["username"]
+        message = request.form["message"]
+        add_message(username, message)
+        return redirect(url_for("user", username=session["username"]))
 
+    return render_template("chat.html", username=username,
+                           chat_messages=messages)
 
-@app.route("/<username>/<message>")
-def send_message(username, message):
-    """Create a new message and redirect back to the chat page"""
-    add_messages(username, message)
-    return redirect("/" + username)
-    #{} means returning a string
 
 
 # app.run(host=os.getenv("IP"), port=int(os.getenv("PORT")), debug=True)
