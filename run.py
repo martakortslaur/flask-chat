@@ -1,7 +1,7 @@
 #To have access to the environment variables
 import os
 from datetime import datetime
-from flask import Flask, redirect, render_template, request, session,
+from flask import Flask, redirect, render_template, request, session, \
     url_for
 #To initalize our new Flaks application
 app = Flask(__name__)
@@ -41,7 +41,8 @@ def user(username):
         username = session["username"]
         message = request.form["message"]
         add_message(username, message)
-        return redirect(url_for("user", username=session["username"]))
+        return redirect(url_for("user", username=session["username"]
+        ))
 
     return render_template("chat.html", username=username,
                            chat_messages=messages)
@@ -50,4 +51,4 @@ def user(username):
 
 # app.run(host=os.getenv("IP"), port=int(os.getenv("PORT")), debug=True)
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")
